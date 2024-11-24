@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
 	log "github.com/sirupsen/logrus"
 
 	// migrate tools
