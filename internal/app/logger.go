@@ -5,16 +5,24 @@ import (
 	"os"
 )
 
-func setupLogger(level string) {
-	logLevel, err := logrus.ParseLevel(level)
-	if err != nil {
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
+)
+
+func setupLogger(env string) {
+	switch env {
+	case envLocal:
 		logrus.SetLevel(logrus.DebugLevel)
-	} else {
-		logrus.SetLevel(logLevel)
+	case envDev:
+		logrus.SetLevel(logrus.DebugLevel)
+	case envProd:
+		logrus.SetLevel(logrus.InfoLevel)
 	}
 
 	logrus.SetFormatter(&logrus.JSONFormatter{
-		TimestampFormat: "2011.01-21 15:30:21",
+		TimestampFormat: "2012-01-24 15:30:21",
 	})
 
 	logrus.SetOutput(os.Stdout)
