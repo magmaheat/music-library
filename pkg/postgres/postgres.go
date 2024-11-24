@@ -9,23 +9,27 @@ import (
 	"time"
 )
 
-//const (
-//	defaultAttempts = 20
-//	defaultPoolSize = 1
-//	defaultConnTime = time.Second
-//)
-
 type Postgres struct {
-	maxPoolSize  int           `default:"1"`
-	connAttempts int           `default:"20"`
-	connTimeout  time.Duration `default:"time.Second"`
+	maxPoolSize  int
+	connAttempts int
+	connTimeout  time.Duration
 
 	Builder squirrel.StatementBuilderType
 	Pool    *pgxpool.Pool
 }
 
-func New(url string, opts ...Options) (*Postgres, error) {
-	pg := &Postgres{}
+func NewPostgres() *Postgres {
+	return &Postgres{
+		maxPoolSize:  1,
+		connAttempts: 20,
+		connTimeout:  time.Second,
+		Builder:      squirrel.StatementBuilderType{},
+		Pool:         nil,
+	}
+}
+
+func New(storagePath string, opts ...Options) (*Postgres, error) {
+	pg := NewPostgres()
 
 	for _, opt := range opts {
 		opt(pg)
@@ -33,7 +37,7 @@ func New(url string, opts ...Options) (*Postgres, error) {
 
 	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
-	poolConfig, err := pgxpool.ParseConfig(url)
+	poolConfig, err := pgxpool.ParseConfig(storagePath)
 	if err != nil {
 		return nil, fmt.Errorf("pgdb - New - pgxpool.ParseConfig: %v", err)
 	}
