@@ -3,8 +3,8 @@ package app
 import (
 	"github.com/magmaheat/music-library/internal/config"
 	"github.com/magmaheat/music-library/internal/http"
-	"github.com/magmaheat/music-library/internal/repo"
-	"github.com/magmaheat/music-library/internal/service"
+	"github.com/magmaheat/music-library/internal/repo/pgdb"
+	"github.com/magmaheat/music-library/internal/service/music"
 	"github.com/magmaheat/music-library/pkg/postgres"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,10 +30,10 @@ func Run() {
 	}
 
 	log.Infof("Initializing repositories...")
-	repositories := repo.New(pg)
+	repositories := pgdb.NewRepository(pg)
 
 	log.Infof("Initializing services...")
-	services := service.NewServices(repositories)
+	services := music.NewService(repositories)
 
 	router := http.NewRouter(services)
 

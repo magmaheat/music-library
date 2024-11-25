@@ -1,10 +1,14 @@
 create table if not exists "groups" (
-    id uuid primary key default gen_random_uuid(),
-    name varchar(255) not null
+    id uuid primary key,
+    name varchar(255) not null,
+    group_id uuid not null,
+    release_date DATE not null,
+    "text" text not null,
+    link varchar(255) not null
 );
 
 create table if not exists songs (
-    id uuid primary key default gen_random_uuid(),
+    id uuid primary key,
     name varchar(255) not null,
     group_id uuid not null
 );

@@ -1,13 +1,18 @@
 package pgdb
 
-import "github.com/magmaheat/music-library/pkg/postgres"
+import (
+	def "github.com/magmaheat/music-library/internal/repo"
+	"github.com/magmaheat/music-library/pkg/postgres"
+)
 
-type Repo struct {
+var _ def.MusicRepo = (*repo)(nil)
+
+type repo struct {
 	*postgres.Postgres
 }
 
-func NewRepoMusicLibrary(pg *postgres.Postgres) *Repo {
-	return &Repo{
+func NewRepository(pg *postgres.Postgres) *repo {
+	return &repo{
 		Postgres: pg,
 	}
 }
