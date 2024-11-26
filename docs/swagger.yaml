@@ -4,7 +4,7 @@ info:
   contact:
     email: epishcom@gmail.com
     name: George Epishev
-  description: Music Info is a service for searching and adding music to your library.
+  description: Music Info is a service for searching and adding song to your library.
   title: Music Info
   version: 0.0.1
 paths: {}

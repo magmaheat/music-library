@@ -27,7 +27,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Music Info",
-	Description:      "Music Info is a service for searching and adding music to your library.",
+	Description:      "Music Info is a service for searching and adding song to your library.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
