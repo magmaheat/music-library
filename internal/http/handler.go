@@ -22,7 +22,35 @@ func newMusicHandler(service service.MusicService) *musicHandler {
 	}
 }
 
+type inputGetLibrary struct {
+	NameSong    *string    `json:"song"`
+	NameGroup   *string    `json:"group"`
+	Lyrics      []string   `json:"lyrics"`
+	ReleaseDate *time.Time `json:"release_date"`
+	Link        *string    `json:"link"`
+}
+
 func (h *musicHandler) getLibrary(ctx *gin.Context) {
+	limitParam := ctx.Param("limit")
+	offsetParam := ctx.Param("offset")
+	if limitParam == "" || offsetParam == "" {
+		errorResponse(ctx, http.StatusBadRequest, "no param limit or offset")
+		return
+	}
+
+	limit, err1 := strconv.Atoi(limitParam)
+	offset, err2 := strconv.Atoi(offsetParam)
+	if err1 != nil || err2 != nil {
+		errorResponse(ctx, http.StatusBadRequest, "not valid param offset or limit")
+		return
+	}
+
+	var input inputGetLibrary
+
+	if err := ctx.Bind(&input); err != nil {
+		errorResponse(ctx, http.StatusBadRequest, "invalid body request")
+		return
+	}
 
 }
 
@@ -86,13 +114,15 @@ func (h *musicHandler) updateSong(ctx *gin.Context) {
 		return
 	}
 
-	err = h.service.UpdateSong(ctx, id, converter.ToSongFromHTTPUpdate(
+	song := converter.ToSongFromHTTPUpdate(
 		input.NameSong,
 		input.NameGroup,
 		input.Link,
 		input.Lyrics,
 		input.ReleaseDate,
-	))
+	)
+
+	err = h.service.UpdateSong(ctx, id, song)
 	if err != nil {
 		if errors.Is(err, model.ErrorSongNotFound) {
 			errorResponse(ctx, http.StatusNotFound, err.Error())

@@ -2,9 +2,6 @@ package pgdb
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"github.com/jackc/pgx/v5"
 	"github.com/magmaheat/music-library/internal/model"
 	def "github.com/magmaheat/music-library/internal/repo"
 	"github.com/magmaheat/music-library/pkg/postgres"
@@ -24,10 +21,19 @@ func NewRepository(pg *postgres.Postgres) def.MusicRepo {
 }
 
 func (r *repo) DeleteSong(ctx context.Context, id int) error {
+	const fn = "repo - pgdb - DeleteSong"
+	sql, args, _ := r.Builder.Delete("songs").Where("id = ?", id).ToSql()
 
+	_, err := r.Pool.Query(ctx, sql, args...)
+	if err != nil {
+		log.Errorf("%s - Pool.Query: %v", fn, err)
+		return err
+	}
+
+	return nil
 }
 
-func (r *repo) UpdateSong(ctx context.Context, id int, song model.Song) (model.Song, error) {
+func (r *repo) UpdateSong(ctx context.Context, id int, song model.Song) error {
 	const fn = "repo - pgdb - UpdateSong"
 
 	log.Debug("%s, %v", fn, song)
@@ -53,25 +59,29 @@ func (r *repo) UpdateSong(ctx context.Context, id int, song model.Song) (model.S
 
 	sql, args, _ := queryBuilder.Prefix("RETURNING name, group_name, release_date, lyrics, link").ToSql()
 
-	var updateSong model.Song
-
-	err := r.Pool.QueryRow(ctx, sql, args...).Scan(
-		&updateSong.Name,
-		&updateSong.GroupName,
-		&updateSong.Detail.ReleaseDate,
-		&updateSong.Detail.Lyrics,
-		&updateSong.Detail.Link,
-	)
+	_, err := r.Pool.Query(ctx, sql, args...)
 
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			log.Errorf("%s - QueryRow: %v", err)
-			return model.Song{}, model.ErrorSongNotFound
-		}
-
 		log.Errorf("%s - QueryRow: %v", fn, err)
-		return model.Song{}, fmt.Errorf("QueryRow")
+		return err
 	}
 
-	return updateSong, nil
+	return nil
+}
+
+func (r *repo) GetIdGroup(ctx context.Context, group string) (int, error) {
+	sql, args, _ := r.Builder.Select("id").
+		From("groups").
+		Where("name = ?", group).
+		ToSql()
+
+	var id int
+
+	err := r.Pool.QueryRow(ctx, sql, args...).Scan(&id)
+	if err != nil {
+		log.Errorf("repo - pgdb - GetIdGroup: %v", err)
+		return 0, err
+	}
+
+	return id, nil
 }

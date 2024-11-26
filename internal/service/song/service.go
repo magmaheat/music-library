@@ -31,7 +31,7 @@ func (s *service) DeleteSong(ctx context.Context, id int) error {
 func (s *service) UpdateSong(ctx context.Context, id int, song model.Song) error {
 	err := s.musicRepo.UpdateSong(ctx, id, song)
 	if err != nil {
-		return err
+		return model.Song{}, err
 	}
 
 	return nil

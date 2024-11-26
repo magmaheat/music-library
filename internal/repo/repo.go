@@ -7,5 +7,6 @@ import (
 
 type MusicRepo interface {
 	DeleteSong(ctx context.Context, id int) error
-	UpdateSong(ctx context.Context, id int, song model.Song) (model.Song, error)
+	UpdateSong(ctx context.Context, id int, song model.Song) error
+	GetIdGroup(ctx context.Context, group string) (int, error)
 }
